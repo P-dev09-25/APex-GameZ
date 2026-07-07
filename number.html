@@ -3,572 +3,336 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Signal Lock — Number Guessing Arcade</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<title>Number Guessing Game</title>
+
+<link rel="stylesheet"
+href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
 <style>
-  :root{
-    --bg:#05060a;
-    --neon-1:#ff2f92;
-    --neon-2:#2fe7ff;
-    --neon-3:#ffe94a;
-    --panel:#0d0f18;
-    --line:rgba(47,231,255,0.25);
-    --danger:#ff3b5c;
-    --ok:#2ff5a0;
-  }
-  *{box-sizing:border-box;}
-  html,body{height:100%;}
-  body{
+
+*{
     margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
     min-height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    background:var(--bg);
-    color:#eafcff;
-    font-family:'Space Mono', monospace;
+    background:#05010f;
+    color:white;
     position:relative;
-    overflow:hidden;
-    padding:20px;
-  }
+    overflow-x:hidden;
+}
 
-  /* CRT grid + scanlines */
-  body::before{
+/* animated aurora background */
+
+body::before,
+body::after{
     content:"";
-    position:absolute; inset:0;
-    background-image:
-      linear-gradient(rgba(47,231,255,0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(47,231,255,0.05) 1px, transparent 1px);
-    background-size:34px 34px;
-    animation:gridmove 14s linear infinite;
+    position:fixed;
+    width:600px;
+    height:600px;
+    border-radius:50%;
+    filter:blur(120px);
+    opacity:.45;
     z-index:0;
-  }
-  @keyframes gridmove{ from{background-position:0 0;} to{background-position:0 340px;} }
-
-  body::after{
-    content:"";
-    position:absolute; inset:0;
-    background:repeating-linear-gradient(180deg, rgba(0,0,0,0.35) 0 2px, transparent 2px 4px);
+    animation:drift 12s ease-in-out infinite alternate;
     pointer-events:none;
-    z-index:5;
-    mix-blend-mode:multiply;
-    opacity:0.35;
-  }
+}
 
-  #confettiCanvas{
-    position:fixed; inset:0; pointer-events:none; z-index:6;
-  }
+body::before{
+    background:#ff2fd0;
+    top:-150px;
+    left:-150px;
+}
 
-  .back-btn{
-    position:absolute; top:18px; left:18px;
-    width:46px; height:46px; border-radius:10px;
-    display:flex; justify-content:center; align-items:center;
-    text-decoration:none; color:var(--neon-2); font-size:20px;
-    background:rgba(47,231,255,0.06);
-    border:1px solid var(--line);
-    z-index:10; transition:.25s;
-  }
-  .back-btn:hover{ background:rgba(47,231,255,0.18); box-shadow:0 0 16px rgba(47,231,255,.5); }
+body::after{
+    background:#2fb8ff;
+    bottom:-150px;
+    right:-150px;
+    animation-delay:2s;
+}
 
-  .cabinet{
+@keyframes drift{
+    0%{ transform:translate(0,0) scale(1); }
+    100%{ transform:translate(80px,60px) scale(1.2); }
+}
+
+/* Header */
+
+header{
     position:relative;
     z-index:2;
-    width:460px;
-    max-width:100%;
-    background:linear-gradient(180deg, #10131f, #0a0c14);
-    border:2px solid var(--line);
-    border-radius:18px;
-    padding:26px 24px 24px;
-    box-shadow:
-      0 0 0 1px rgba(255,255,255,0.02) inset,
-      0 30px 70px rgba(0,0,0,0.6),
-      0 0 40px rgba(255,47,146,0.08);
-  }
-  .cabinet.shake{ animation:shake 0.35s; }
-  @keyframes shake{
-    0%,100%{ transform:translateX(0); }
-    20%{ transform:translateX(-8px) rotate(-0.5deg); }
-    40%{ transform:translateX(7px) rotate(0.5deg); }
-    60%{ transform:translateX(-5px); }
-    80%{ transform:translateX(4px); }
-  }
-
-  .marquee{
     text-align:center;
-    font-family:'Press Start 2P', monospace;
-    font-size:13px;
-    line-height:1.8;
-    letter-spacing:1px;
-    background:linear-gradient(90deg, var(--neon-1), var(--neon-3), var(--neon-2));
+    padding:28px;
+    background:rgba(255,255,255,0.06);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(255,255,255,0.1);
+}
+
+header h1{
+    font-size:2rem;
+    background:linear-gradient(90deg,#ff2fd0,#7b2fff,#2fb8ff);
     background-size:200% auto;
     -webkit-background-clip:text;
     background-clip:text;
     color:transparent;
-    animation:shine 5s linear infinite;
-    margin-bottom:6px;
-  }
-  @keyframes shine{ to{ background-position:200% center; } }
+    animation:shine 4s linear infinite;
+}
 
-  .tagline{
-    text-align:center;
-    color:#7fdcff;
-    font-size:11px;
-    letter-spacing:2px;
-    text-transform:uppercase;
-    margin-bottom:18px;
-    opacity:0.8;
-  }
+@keyframes shine{
+    to{ background-position:200% center; }
+}
 
-  .topbar{
+/* Back Button */
+
+.back-btn{
+    position:absolute;
+    top:20px;
+    left:20px;
+    width:50px;
+    height:50px;
+    border-radius:50%;
     display:flex;
-    justify-content:space-between;
+    justify-content:center;
     align-items:center;
-    margin-bottom:16px;
-    font-size:11px;
-  }
-  .pill{
-    padding:6px 12px;
-    border-radius:20px;
-    border:1px solid var(--line);
-    background:rgba(255,255,255,0.03);
-    letter-spacing:0.5px;
-  }
-  #soundToggle{
-    cursor:pointer;
-    user-select:none;
-    background:rgba(255,255,255,0.04);
-  }
-  #soundToggle:hover{ border-color:var(--neon-2); }
+    text-decoration:none;
+    font-size:26px;
+    color:white;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.15);
+    backdrop-filter:blur(10px);
+    transition:0.3s;
+    z-index:10;
+}
 
-  /* Level select */
-  .levels{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
-  }
-  .level-btn{
-    background:rgba(255,255,255,0.03);
-    border:1px solid var(--line);
-    border-radius:12px;
-    padding:16px 12px;
-    color:#eafcff;
-    text-align:left;
-    cursor:pointer;
-    transition:.2s;
+.back-btn:hover{
+    background:linear-gradient(135deg,#ff2fd0,#7b2fff);
+    box-shadow:0 0 25px rgba(255,47,208,.7);
+    transform:scale(1.1) rotate(-8deg);
+}
+
+/* Main */
+
+.container{
     position:relative;
-    overflow:hidden;
-  }
-  .level-btn::after{
+    z-index:2;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:50px 20px;
+}
+
+.card{
+    position:relative;
+    width:420px;
+    background:rgba(255,255,255,0.06);
+    backdrop-filter:blur(18px);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:24px;
+    padding:24px;
+    text-align:center;
+    box-shadow:0 0 50px rgba(123,47,255,.3);
+    transition:0.4s;
+}
+
+.card::before{
     content:"";
-    position:absolute; inset:0;
-    background:linear-gradient(120deg, transparent, rgba(47,231,255,0.15), transparent);
-    transform:translateX(-120%);
-    transition:.5s;
-  }
-  .level-btn:hover::after{ transform:translateX(120%); }
-  .level-btn:hover{ border-color:var(--neon-2); transform:translateY(-3px); box-shadow:0 10px 24px rgba(0,0,0,.4); }
-  .level-btn b{
-    display:block; font-family:'Press Start 2P',monospace; font-size:12px;
-    color:var(--neon-3); margin-bottom:6px;
-  }
-  .level-btn span{ font-size:11px; color:#9fb8c4; }
+    position:absolute;
+    inset:-2px;
+    border-radius:24px;
+    padding:2px;
+    background:conic-gradient(from 0deg,#ff2fd0,#7b2fff,#2fb8ff,#ff2fd0);
+    mask-composite:exclude;
+    opacity:.7;
+    animation:spin 1.6s ease-in-out 1 forwards;
+    z-index:-1;
+}
 
-  /* Game area */
-  #gameArea{ display:none; }
+@keyframes spin{
+    0%{ transform:rotate(0deg); opacity:.7; }
+    85%{ transform:rotate(360deg); opacity:.7; }
+    100%{ transform:rotate(360deg); opacity:0; }
+}
 
-  .hud{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:14px;
-    font-size:11px;
-    color:#9fb8c4;
-  }
-  #changeLevel{
-    background:none; border:1px solid var(--line); color:#9fb8c4;
-    padding:5px 10px; border-radius:8px; cursor:pointer; font-family:'Space Mono',monospace; font-size:10px;
-  }
-  #changeLevel:hover{ color:var(--neon-2); border-color:var(--neon-2); }
+.card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 0 70px rgba(123,47,255,.5);
+}
 
-  /* signal meter */
-  .meter-label{
-    display:flex; justify-content:space-between;
-    font-size:10.5px; letter-spacing:1px; color:#9fb8c4; margin-bottom:6px;
-  }
-  .meter{
-    height:16px;
-    border-radius:8px;
-    background:#0a0c14;
-    border:1px solid var(--line);
-    overflow:hidden;
-    margin-bottom:16px;
-    position:relative;
-  }
-  #meterFill{
-    height:100%;
-    width:0%;
-    border-radius:8px;
-    background:linear-gradient(90deg, #2fe7ff, #ffe94a, #ff3b5c);
-    transition:width .5s cubic-bezier(.22,1.4,.36,1), filter .3s;
-    box-shadow:0 0 12px currentColor;
-  }
-
-  /* lives */
-  .lives{
-    display:flex; gap:8px; justify-content:center; margin-bottom:18px;
-  }
-  .life{
-    width:20px; height:20px;
-    clip-path:polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-    background:var(--neon-3);
-    transition:.3s;
-    box-shadow:0 0 6px rgba(255,233,74,0.6);
-  }
-  .life.lost{
-    background:#2a2a33;
-    box-shadow:none;
-    transform:scale(0.8) rotate(20deg);
-    opacity:0.5;
-  }
-
-  .input-row{ display:flex; gap:10px; margin-bottom:8px; }
-  #guessInput{
-    flex:1;
-    padding:14px;
-    border:2px solid var(--line);
-    border-radius:10px;
-    text-align:center;
-    font-family:'Press Start 2P', monospace;
-    font-size:18px;
-    background:#05060a;
-    color:var(--neon-2);
-    outline:none;
-    transition:.2s;
-  }
-  #guessInput:focus{ border-color:var(--neon-2); box-shadow:0 0 18px rgba(47,231,255,.4); }
-  #guessBtn{
-    padding:0 22px;
-    border:none; border-radius:10px;
-    background:linear-gradient(135deg, var(--neon-1), #7b2fff);
-    color:white; font-weight:700; letter-spacing:1px;
-    cursor:pointer; transition:.2s; font-family:'Space Mono',monospace; font-size:13px;
-  }
-  #guessBtn:hover:not(:disabled){ filter:brightness(1.15); transform:translateY(-2px); }
-  #guessBtn:disabled{ opacity:.4; cursor:not-allowed; }
-
-  #message{
-    text-align:center;
-    font-family:'Press Start 2P', monospace;
-    font-size:13px;
-    min-height:24px;
-    margin:14px 0 6px;
-    transition:.2s;
-  }
-  #message.hot{ color:var(--danger); }
-  #message.cold{ color:var(--neon-2); }
-  #message.win{ color:var(--ok); animation:pop .4s; }
-  #message.lose{ color:var(--danger); }
-  @keyframes pop{ 0%{ transform:scale(0.7); } 60%{ transform:scale(1.15); } 100%{ transform:scale(1); } }
-
-  .streakline{
-    display:flex; justify-content:space-between;
-    font-size:10.5px; color:#9fb8c4; margin-top:10px;
-  }
-  .streakline b{ color:var(--neon-3); }
-
-  .history{
-    display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-top:14px; min-height:24px;
-  }
-  .chip{
-    font-size:10.5px; padding:4px 8px; border-radius:6px;
-    background:rgba(255,255,255,0.04); border:1px solid var(--line); color:#9fb8c4;
-  }
-  .chip.hot{ color:var(--danger); border-color:rgba(255,59,92,0.4); }
-  .chip.cold{ color:var(--neon-2); border-color:rgba(47,231,255,0.4); }
-
-  #restartBtn{
-    display:none;
+.card img{
     width:100%;
-    margin-top:16px;
-    padding:14px;
-    border:none; border-radius:10px;
-    background:linear-gradient(135deg, var(--ok), #2fe7ff);
-    color:#04140f; font-weight:700; letter-spacing:1px;
-    cursor:pointer; font-family:'Space Mono',monospace; font-size:13px;
-    transition:.2s;
-  }
-  #restartBtn:hover{ filter:brightness(1.1); transform:translateY(-2px); }
+    height:250px;
+    object-fit:cover;
+    border-radius:16px;
+    filter:brightness(.85);
+    transition:.4s;
+}
 
-  @media(max-width:500px){
-    .cabinet{ padding:20px; }
-    .marquee{ font-size:11px; }
-  }
+.card:hover img{
+    filter:brightness(1);
+    transform:scale(1.02);
+}
+
+.card h2{
+    margin-top:16px;
+    font-size:1.4rem;
+    color:#fff;
+}
+
+.card p{
+    margin-top:10px;
+    color:#cbd5e1;
+    line-height:1.5;
+    font-size:.95rem;
+}
+
+/* Level Buttons */
+
+.levels{
+    margin-top:26px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+}
+
+.levels a{
+    position:relative;
+    overflow:hidden;
+    text-decoration:none;
+    color:white;
+    padding:16px;
+    border-radius:14px;
+    font-size:17px;
+    font-weight:bold;
+    letter-spacing:.3px;
+    transition:.3s;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    box-shadow:0 6px 18px rgba(0,0,0,.35);
+}
+
+.levels a::after{
+    content:"";
+    position:absolute;
+    top:0;
+    left:-100%;
+    width:100%;
+    height:100%;
+    background:linear-gradient(120deg,transparent,rgba(255,255,255,.35),transparent);
+    transition:.5s;
+}
+
+.levels a:hover::after{
+    left:100%;
+}
+
+.easy{
+    background:linear-gradient(135deg,#22c55e,#16a34a);
+}
+
+.medium{
+    background:linear-gradient(135deg,#facc15,#eab308);
+    color:#1a1a1a !important;
+}
+
+.hard{
+    background:linear-gradient(135deg,#fb923c,#f97316);
+}
+
+.extreme{
+    background:linear-gradient(135deg,#f87171,#ef4444);
+}
+
+.easy:hover{
+    transform:scale(1.05) translateY(-2px);
+    box-shadow:0 10px 25px rgba(34,197,94,.55);
+}
+
+.medium:hover{
+    transform:scale(1.05) translateY(-2px);
+    box-shadow:0 10px 25px rgba(234,179,8,.55);
+}
+
+.hard:hover{
+    transform:scale(1.05) translateY(-2px);
+    box-shadow:0 10px 25px rgba(249,115,22,.55);
+}
+
+.extreme:hover{
+    transform:scale(1.05) translateY(-2px);
+    box-shadow:0 10px 25px rgba(239,68,68,.55);
+}
+
+/* Responsive */
+
+@media(max-width:500px){
+
+    .card{
+        width:95%;
+        padding:18px;
+    }
+
+    .card img{
+        height:200px;
+    }
+
+    header h1{
+        font-size:1.5rem;
+    }
+}
+
 </style>
 </head>
 <body>
 
-<canvas id="confettiCanvas"></canvas>
+<a href="main.html" class="back-btn">
+    <i class="bi bi-arrow-left"></i>
+</a>
 
-<a href="number.html" class="back-btn">&#8592;</a>
+<header>
+    <h1>🎮 Number Guessing Game</h1>
+</header>
 
-<div class="cabinet" id="cabinet">
-  <div class="marquee">SIGNAL LOCK</div>
-  <div class="tagline">find the frequency before static wins</div>
+<div class="container">
 
-  <div class="topbar">
-    <span class="pill">Best streak: <b id="bestStreakTop">0</b></span>
-    <span class="pill" id="soundToggle" onclick="toggleSound()">🔊 Sound: ON</span>
-  </div>
+    <div class="card">
 
-  <div id="levelSelect">
-    <div class="levels">
-      <button class="level-btn" onclick="selectLevel('easy')">
-        <b>ROOKIE</b>
-        <span>1–50 · 10 tries</span>
-      </button>
-      <button class="level-btn" onclick="selectLevel('medium')">
-        <b>PRO</b>
-        <span>1–100 · 7 tries</span>
-      </button>
-      <button class="level-btn" onclick="selectLevel('hard')">
-        <b>ELITE</b>
-        <span>1–200 · 5 tries</span>
-      </button>
-      <button class="level-btn" onclick="selectLevel('extreme')">
-        <b>LEGENDARY</b>
-        <span>1–500 · 3 tries</span>
-      </button>
-    </div>
-  </div>
+        <img src="number.jpeg" alt="Number Guessing Game">
 
-  <div id="gameArea">
-    <div class="hud">
-      <span id="levelInfo"></span>
-      <button id="changeLevel" onclick="backToLevels()">Change level</button>
-    </div>
+        <h2>Select Difficulty Level</h2>
 
-    <div class="meter-label"><span>COLD</span><span>SIGNAL STRENGTH</span><span>HOT</span></div>
-    <div class="meter"><div id="meterFill"></div></div>
+        <p>
+            Choose your level and start guessing the secret number.
+            Higher levels give fewer attempts and larger number ranges.
+        </p>
 
-    <div class="lives" id="lives"></div>
+        <div class="levels">
 
-    <div class="input-row">
-      <input type="number" id="guessInput" placeholder="?" onkeydown="if(event.key==='Enter')checkGuess()">
-      <button id="guessBtn" onclick="checkGuess()">LOCK IN</button>
+            <a href="play.html?level=easy" class="easy">
+                🟢 Easy (1 - 50) | 10 Attempts
+            </a>
+
+            <a href="play.html?level=medium" class="medium">
+                🟡 Medium (1 - 100) | 7 Attempts
+            </a>
+
+            <a href="play.html?level=hard" class="hard">
+                🟠 Hard (1 - 200) | 5 Attempts
+            </a>
+
+            <a href="play.html?level=extreme" class="extreme">
+                🔴 Extreme (1 - 500) | 3 Attempts
+            </a>
+
+        </div>
+
     </div>
 
-    <p id="message"></p>
-    <div class="history" id="history"></div>
-
-    <div class="streakline">
-      <span>Current streak: <b id="curStreak">0</b></span>
-      <span>Best on this level: <b id="levelBest">—</b></span>
-    </div>
-
-    <button id="restartBtn" onclick="selectLevel(current)">🔁 Play Again</button>
-  </div>
 </div>
-
-<script>
-  const LEVELS = {
-    easy:    { label: 'ROOKIE (1–50)',      max: 50,  attempts: 10 },
-    medium:  { label: 'PRO (1–100)',        max: 100, attempts: 7  },
-    hard:    { label: 'ELITE (1–200)',      max: 200, attempts: 5  },
-    extreme: { label: 'LEGENDARY (1–500)',  max: 500, attempts: 3  }
-  };
-
-  const levelBests = {};
-  let current = null;
-  let secret = 0, attemptsLeft = 0, attemptsUsed = 0, gameOver = false;
-  let streak = 0, bestStreak = 0;
-  let soundOn = true;
-
-  // ---------- Sound (Web Audio, no external files) ----------
-  let audioCtx = null;
-  function ctx(){ if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); return audioCtx; }
-  function beep(freq, dur, type='sine', delay=0, gain=0.08){
-    if(!soundOn) return;
-    const c = ctx();
-    const osc = c.createOscillator();
-    const g = c.createGain();
-    osc.type = type;
-    osc.frequency.value = freq;
-    g.gain.value = gain;
-    osc.connect(g); g.connect(c.destination);
-    const t = c.currentTime + delay;
-    osc.start(t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
-    osc.stop(t + dur + 0.02);
-  }
-  function sfxCold(){ beep(220, 0.15, 'sine'); }
-  function sfxHot(){ beep(140, 0.15, 'sawtooth'); }
-  function sfxWin(){ beep(523,0.12,'square',0); beep(659,0.12,'square',0.12); beep(784,0.22,'square',0.24); }
-  function sfxLose(){ beep(180,0.3,'sawtooth',0); beep(120,0.35,'sawtooth',0.15); }
-  function sfxClick(){ beep(880,0.05,'square',0,0.04); }
-
-  function toggleSound(){
-    soundOn = !soundOn;
-    document.getElementById('soundToggle').textContent = soundOn ? '🔊 Sound: ON' : '🔇 Sound: OFF';
-  }
-
-  // ---------- Confetti ----------
-  const canvas = document.getElementById('confettiCanvas');
-  const cx = canvas.getContext('2d');
-  function resizeCanvas(){ canvas.width = innerWidth; canvas.height = innerHeight; }
-  window.addEventListener('resize', resizeCanvas); resizeCanvas();
-  let particles = [];
-  function burstConfetti(){
-    const colors = ['#ff2f92','#2fe7ff','#ffe94a','#2ff5a0','#7b2fff'];
-    for(let i=0;i<90;i++){
-      particles.push({
-        x: canvas.width/2, y: canvas.height/2.4,
-        vx: (Math.random()-0.5)*12, vy: (Math.random()-1.6)*12,
-        size: Math.random()*6+3,
-        color: colors[Math.floor(Math.random()*colors.length)],
-        life: 100, rot: Math.random()*360, vr:(Math.random()-0.5)*10
-      });
-    }
-    if(!confettiRunning){ confettiRunning = true; requestAnimationFrame(animateConfetti); }
-  }
-  let confettiRunning = false;
-  function animateConfetti(){
-    cx.clearRect(0,0,canvas.width,canvas.height);
-    particles.forEach(p=>{
-      p.vy += 0.28; p.x += p.vx; p.y += p.vy; p.life--; p.rot += p.vr;
-      cx.save();
-      cx.translate(p.x,p.y); cx.rotate(p.rot*Math.PI/180);
-      cx.fillStyle = p.color;
-      cx.fillRect(-p.size/2,-p.size/2,p.size,p.size);
-      cx.restore();
-    });
-    particles = particles.filter(p=>p.life>0 && p.y<canvas.height+50);
-    if(particles.length>0){ requestAnimationFrame(animateConfetti); }
-    else { confettiRunning = false; cx.clearRect(0,0,canvas.width,canvas.height); }
-  }
-
-  // ---------- Game logic ----------
-  function selectLevel(levelKey){
-    current = levelKey;
-    const cfg = LEVELS[levelKey];
-    secret = Math.floor(Math.random()*cfg.max)+1;
-    attemptsLeft = cfg.attempts;
-    attemptsUsed = 0;
-    gameOver = false;
-
-    document.getElementById('levelSelect').style.display = 'none';
-    document.getElementById('gameArea').style.display = 'block';
-    document.getElementById('levelInfo').textContent = cfg.label;
-    document.getElementById('guessInput').value = '';
-    document.getElementById('guessInput').disabled = false;
-    document.getElementById('guessBtn').disabled = false;
-    document.getElementById('restartBtn').style.display = 'none';
-    document.getElementById('message').textContent = '';
-    document.getElementById('message').className = '';
-    document.getElementById('history').innerHTML = '';
-    document.getElementById('meterFill').style.width = '0%';
-    document.getElementById('levelBest').textContent = levelBests[current] ? levelBests[current]+' tries' : '—';
-    renderLives();
-    document.getElementById('guessInput').focus();
-  }
-
-  function backToLevels(){
-    document.getElementById('gameArea').style.display = 'none';
-    document.getElementById('levelSelect').style.display = 'block';
-  }
-
-  function renderLives(){
-    const cfg = LEVELS[current];
-    const wrap = document.getElementById('lives');
-    wrap.innerHTML = '';
-    for(let i=0;i<cfg.attempts;i++){
-      const d = document.createElement('div');
-      d.className = 'life' + (i < attemptsUsed ? ' lost' : '');
-      wrap.appendChild(d);
-    }
-  }
-
-  function addChip(guess, dir){
-    const chip = document.createElement('span');
-    chip.className = 'chip ' + dir;
-    chip.textContent = guess;
-    document.getElementById('history').appendChild(chip);
-  }
-
-  function shakeCabinet(){
-    const cab = document.getElementById('cabinet');
-    cab.classList.remove('shake');
-    void cab.offsetWidth;
-    cab.classList.add('shake');
-  }
-
-  function checkGuess(){
-    if(gameOver) return;
-    const cfg = LEVELS[current];
-    const input = document.getElementById('guessInput');
-    const val = parseInt(input.value, 10);
-    const msg = document.getElementById('message');
-
-    if(isNaN(val) || val < 1 || val > cfg.max){
-      msg.className = 'hot';
-      msg.textContent = `PICK 1–${cfg.max}`;
-      shakeCabinet();
-      return;
-    }
-
-    sfxClick();
-    attemptsUsed++;
-    attemptsLeft--;
-    renderLives();
-
-    const distance = Math.abs(val - secret);
-    const closeness = 1 - Math.min(distance / cfg.max, 1);
-    const fill = document.getElementById('meterFill');
-    fill.style.width = (closeness*100).toFixed(0) + '%';
-
-    if(val === secret){
-      msg.className = 'win';
-      msg.textContent = `🎯 LOCKED! IT WAS ${secret}`;
-      addChip(val, '');
-      sfxWin();
-      burstConfetti();
-      streak++;
-      if(streak > bestStreak){ bestStreak = streak; document.getElementById('bestStreakTop').textContent = bestStreak; }
-      if(!levelBests[current] || attemptsUsed < levelBests[current]){ levelBests[current] = attemptsUsed; }
-      document.getElementById('levelBest').textContent = levelBests[current]+' tries';
-      document.getElementById('curStreak').textContent = streak;
-      endGame();
-      return;
-    }
-
-    const dir = val < secret ? 'cold' : 'hot';
-    addChip(val, dir);
-    msg.className = dir;
-    msg.textContent = val < secret ? '⬆ TOO LOW' : '⬇ TOO HIGH';
-    dir === 'cold' ? sfxCold() : sfxHot();
-
-    if(attemptsLeft <= 0){
-      msg.className = 'lose';
-      msg.textContent = `💥 STATIC WINS — IT WAS ${secret}`;
-      sfxLose();
-      shakeCabinet();
-      streak = 0;
-      document.getElementById('curStreak').textContent = streak;
-      endGame();
-      return;
-    }
-
-    input.value = '';
-    input.focus();
-  }
-
-  function endGame(){
-    gameOver = true;
-    document.getElementById('guessInput').disabled = true;
-    document.getElementById('guessBtn').disabled = true;
-    document.getElementById('restartBtn').style.display = 'block';
-  }
-</script>
 
 </body>
 </html>
