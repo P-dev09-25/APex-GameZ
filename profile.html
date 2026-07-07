@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile - APex GameZ</title>
+
+<link rel="stylesheet"
+href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    min-height:100vh;
+    background:linear-gradient(135deg,#0f172a,#1e293b);
+    color:white;
+}
+
+/* Navbar */
+
+.navbar{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    padding:15px 30px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(10px);
+    z-index:1000;
+}
+
+.nav-left{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.back-arrow{
+    color:white;
+    font-size:28px;
+    text-decoration:none;
+}
+
+.back-arrow:hover{
+    color:#38bdf8;
+}
+
+.navbar ul{
+    display:flex;
+    gap:20px;
+    list-style:none;
+}
+
+.navbar ul li a{
+    text-decoration:none;
+    color:white;
+}
+
+.navbar ul li a:hover{
+    color:#38bdf8;
+}
+
+/* Container */
+
+.container{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    padding-top:90px;
+}
+
+/* Profile Card */
+
+.profile-card{
+    width:420px;
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(12px);
+    padding:30px;
+    border-radius:20px;
+    text-align:center;
+    box-shadow:0 0 25px rgba(0,0,0,0.4);
+}
+
+.avatar{
+    width:120px;
+    height:120px;
+    margin:auto;
+    border-radius:50%;
+    background:#38bdf8;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:60px;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.avatar:hover{
+    transform:scale(1.1);
+    box-shadow:0 0 20px #38bdf8;
+}
+
+h1{
+    margin:20px 0;
+}
+
+.stat-box{
+    background:rgba(255,255,255,0.1);
+    padding:12px;
+    margin:12px 0;
+    border-radius:10px;
+    font-size:18px;
+}
+
+/* Overlay */
+
+.popup-overlay{
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.7);
+    z-index:9998;
+}
+
+/* Avatar Popup */
+
+.avatar-popup{
+    display:none;
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:340px;
+    background:#1e293b;
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0 0 25px rgba(0,0,0,0.5);
+    z-index:9999;
+    text-align:center;
+}
+
+.avatar-popup h3{
+    margin-bottom:15px;
+}
+
+.avatar-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+}
+
+.avatar-grid span{
+    font-size:35px;
+    cursor:pointer;
+    padding:10px;
+    border-radius:10px;
+    transition:.3s;
+}
+
+.avatar-grid span:hover{
+    background:rgba(255,255,255,0.15);
+    transform:scale(1.2);
+}
+
+@media(max-width:500px){
+
+    .profile-card{
+        width:90%;
+    }
+
+    .avatar-popup{
+        width:90%;
+    }
+
+    .navbar{
+        padding:15px;
+    }
+
+    .navbar ul{
+        gap:10px;
+    }
+}
+
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+
+    <div class="nav-left">
+        <a href="main.html" class="back-arrow">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+
+        <h2>Profile</h2>
+    </div>
+
+    <ul>
+        <li><a href="main.html">Home</a></li>
+        <li><a href="leaderboard.html">Leaderboard</a></li>
+    </ul>
+
+</nav>
+
+<div class="container">
+
+    <div class="profile-card">
+
+        <div class="avatar"
+             id="avatar"
+             onclick="openAvatarBox()">
+            🎮
+        </div>
+
+        <h1 id="username">Loading...</h1>
+
+        <div class="stat-box">
+            🎮 Games Played:
+            <span id="gamesPlayed">0</span>
+        </div>
+
+        <div class="stat-box">
+            🏆 Games Won:
+            <span id="gamesWon">0</span>
+        </div>
+
+        <div class="stat-box">
+            🥇 Best Score:
+            <span id="bestScore">999</span>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Overlay -->
+<div class="popup-overlay" id="overlay"></div>
+
+<!-- Avatar Popup -->
+<div class="avatar-popup" id="avatarPopup">
+
+    <h3>Select Avatar</h3>
+
+    <div class="avatar-grid">
+
+        <span onclick="selectAvatar('😀')">😀</span>
+        <span onclick="selectAvatar('😎')">😎</span>
+        <span onclick="selectAvatar('🤖')">🤖</span>
+        <span onclick="selectAvatar('👽')">👽</span>
+
+        <span onclick="selectAvatar('🐱')">🐱</span>
+        <span onclick="selectAvatar('🐶')">🐶</span>
+        <span onclick="selectAvatar('🦊')">🦊</span>
+        <span onclick="selectAvatar('🐼')">🐼</span>
+
+        <span onclick="selectAvatar('🦁')">🦁</span>
+        <span onclick="selectAvatar('🐯')">🐯</span>
+        <span onclick="selectAvatar('🐸')">🐸</span>
+        <span onclick="selectAvatar('🐵')">🐵</span>
+
+    </div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+
+import {
+getDatabase,
+ref,
+get,
+update
+}
+from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
+
+const firebaseConfig = {
+apiKey: "YOUR_API_KEY",
+authDomain: "apexgamez-d4b3e.firebaseapp.com",
+databaseURL: "https://apexgamez-d4b3e-default-rtdb.firebaseio.com",
+projectId: "apexgamez-d4b3e",
+storageBucket: "apexgamez-d4b3e.firebasestorage.app",
+messagingSenderId: "725375248395",
+appId: "1:725375248395:web:dc3f25f237759fe447ff0e"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const username = localStorage.getItem("username");
+
+if(!username){
+    window.location.href = "username.html";
+}
+
+const userRef = ref(db,"users/" + username);
+
+async function loadProfile(){
+
+    const snapshot = await get(userRef);
+
+    if(snapshot.exists()){
+
+        const user = snapshot.val();
+
+        document.getElementById("username").innerHTML =
+        user.username || username;
+
+        document.getElementById("gamesPlayed").innerHTML =
+        user.gamesPlayed || 0;
+
+        document.getElementById("gamesWon").innerHTML =
+        user.gamesWon || 0;
+
+        document.getElementById("bestScore").innerHTML =
+        user.bestScore || 999;
+
+        document.getElementById("avatar").innerHTML =
+        user.avatar || "🎮";
+    }
+}
+
+loadProfile();
+
+window.openAvatarBox = function(){
+
+    document.getElementById("avatarPopup").style.display = "block";
+    document.getElementById("overlay").style.display = "block";
+}
+
+window.selectAvatar = async function(emoji){
+
+    await update(userRef,{
+        avatar:emoji
+    });
+
+    document.getElementById("avatar").innerHTML = emoji;
+
+    document.getElementById("avatarPopup").style.display = "none";
+    document.getElementById("overlay").style.display = "none";
+}
+
+document.getElementById("overlay")
+.addEventListener("click",function(){
+
+    document.getElementById("avatarPopup").style.display = "none";
+    document.getElementById("overlay").style.display = "none";
+
+});
+
+</script>
+
+</body>
+</html>
