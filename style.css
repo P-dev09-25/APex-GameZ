@@ -1,0 +1,33 @@
+body{
+    background-color:rgb(12, 12, 12);
+    margin:0;
+    font-family:Arial;
+}
+#splash{
+    color:rgb(8, 8, 8);
+     background:linear-gradient(rgb(201, 73, 73),rgb(90, 5, 116),rgb(226, 59, 157),rgb(226, 226, 93));
+    text-align:center;
+    height: 100vh;
+    font-size:30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+.loader{
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #0c0c0c;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 2s linear infinite; /*spead of rotation*/
+}
+@keyframes spin {    /*for loading spain */
+    from{
+        transform: rotate(0deg);
+    }
+    to{
+        transform: rotate(360deg);
+    }
+    
+}
