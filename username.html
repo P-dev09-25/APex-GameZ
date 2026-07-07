@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Choose Username</title>
+
+<style>
+body{
+    margin:0;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#0f172a;
+    font-family:Arial,sans-serif;
+}
+
+.box{
+    background:#1e293b;
+    padding:30px;
+    border-radius:15px;
+    text-align:center;
+    width:350px;
+    color:white;
+}
+
+h1{
+    color:#38bdf8;
+}
+
+input{
+    width:90%;
+    padding:12px;
+    margin:15px 0;
+    border:none;
+    border-radius:8px;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    background:#38bdf8;
+    color:white;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#0ea5e9;
+}
+
+#msg{
+    margin-top:10px;
+    color:#f87171;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+    <h1>🎮 APex GameZ</h1>
+
+    <p>Enter Your Username</p>
+
+    <input
+        type="text"
+        id="username"
+        placeholder="Username">
+
+    <button onclick="saveUsername()">
+        Continue
+    </button>
+
+    <p id="msg"></p>
+
+</div>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+
+import {
+    getDatabase,
+    ref,
+    get,
+    set
+}
+from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCMjFZG36z_dISk4JmjEFfe_XEODS8PaQs",
+    authDomain: "apexgamez-d4b3e.firebaseapp.com",
+    databaseURL: "https://apexgamez-d4b3e-default-rtdb.firebaseio.com",
+    projectId: "apexgamez-d4b3e",
+    storageBucket: "apexgamez-d4b3e.firebasestorage.app",
+    messagingSenderId: "725375248395",
+    appId: "1:725375248395:web:dc3f25f237759fe447ff0e",
+    measurementId: "G-ESP13DX05R"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+window.saveUsername = async function(){
+
+    let username =
+    document.getElementById("username").value.trim();
+
+    if(username.length < 3){
+
+        document.getElementById("msg").innerHTML =
+        "Username must be at least 3 characters";
+
+        return;
+    }
+
+    const userRef =
+    ref(db, "users/" + username);
+
+    const snapshot =
+    await get(userRef);
+
+    if(!snapshot.exists()){
+
+        await set(userRef,{
+            username: username,
+            bestScore: 999,
+            gamesPlayed: 0,
+            gamesWon: 0,
+            avatar: "🎮"
+        });
+    }
+
+    localStorage.setItem(
+        "username",
+        username
+    );
+
+    window.location.href =
+    "main.html";
+}
+
+</script>
+</body>
+</html>

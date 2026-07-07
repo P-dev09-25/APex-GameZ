@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APex GameZ</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    background:#050505;
+    color:white;
+    overflow-x:hidden;
+}
+
+/* HEADER */
+
+header{
+    position:sticky;
+    top:0;
+    z-index:1000;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px 40px;
+    background:rgba(194, 186, 186, 0.08);
+    backdrop-filter:blur(10px);
+    box-shadow:0 4px 10px rgba(167, 163, 163, 0.4);
+}
+
+.logo{
+    font-size:2rem;
+    font-weight:bold;
+    background:linear-gradient(90deg,#9b59ff,#ff59d4,#59d4ff);
+    background-size:200% auto;
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    animation:shine 4s linear infinite;
+}
+
+@keyframes shine{
+    to{ background-position:200% center; }
+}
+
+/* HAMBURGER ICON */
+
+.menu-toggle{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    gap:6px;
+    width:46px;
+    height:46px;
+    cursor:pointer;
+    z-index:1200;
+    border-radius:50%;
+    background:rgba(155,89,255,0.12);
+    transition:.3s;
+}
+
+.menu-toggle:hover{
+    background:rgba(155,89,255,0.3);
+    box-shadow:0 0 15px rgba(155,89,255,.7);
+}
+
+.menu-toggle span{
+    display:block;
+    height:3px;
+    width:22px;
+    background:white;
+    border-radius:3px;
+    transition:.4s cubic-bezier(.68,-0.55,.27,1.55);
+}
+
+.menu-toggle.active{
+    background:rgba(255,89,150,0.25);
+    box-shadow:0 0 20px rgba(255,89,150,.8);
+}
+
+.menu-toggle.active span:nth-child(1){
+    transform:translateY(9px) rotate(45deg);
+}
+
+.menu-toggle.active span:nth-child(2){
+    opacity:0;
+    transform:scaleX(0);
+}
+
+.menu-toggle.active span:nth-child(3){
+    transform:translateY(-9px) rotate(-45deg);
+}
+
+/* FULLSCREEN NAV OVERLAY */
+
+.nav-overlay{
+    position:fixed;
+    top:0;
+    right:0;
+    width:100%;
+    height:100vh;
+    background:radial-gradient(circle at top right, rgba(30,10,50,0.98), rgba(5,5,5,0.98) 70%);
+    backdrop-filter:blur(15px);
+    z-index:1100;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    clip-path:circle(0% at 100% 0%);
+    transition:clip-path .6s cubic-bezier(.77,0,.18,1);
+    pointer-events:none;
+}
+
+.nav-overlay.open{
+    clip-path:circle(150% at 100% 0%);
+    pointer-events:auto;
+}
+
+nav{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+}
+
+nav a{
+    position:relative;
+    text-decoration:none;
+    color:white;
+    font-size:2.2rem;
+    font-weight:600;
+    padding:10px 20px;
+    opacity:0;
+    transform:translateY(30px);
+    transition:.3s;
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.nav-overlay.open nav a{
+    opacity:1;
+    transform:translateY(0);
+}
+
+.nav-overlay.open nav a:nth-child(1){ transition-delay:.1s; }
+.nav-overlay.open nav a:nth-child(2){ transition-delay:.18s; }
+.nav-overlay.open nav a:nth-child(3){ transition-delay:.26s; }
+.nav-overlay.open nav a:nth-child(4){ transition-delay:.34s; }
+.nav-overlay.open nav a:nth-child(5){ transition-delay:.42s; }
+.nav-overlay.open nav a:nth-child(6){ transition-delay:.5s; }
+
+nav a .icon{
+    font-size:1.6rem;
+    filter:drop-shadow(0 0 6px rgba(155,89,255,.8));
+}
+
+nav a::after{
+    content:"";
+    position:absolute;
+    left:20px;
+    bottom:2px;
+    width:0%;
+    height:3px;
+    border-radius:3px;
+    background:linear-gradient(90deg,#9b59ff,#ff59d4);
+    transition:.35s;
+}
+
+nav a:hover{
+    color:#e6d3ff;
+    transform:translateX(10px) scale(1.05);
+}
+
+nav a:hover::after{
+    width:calc(100% - 55px);
+}
+
+.nav-overlay .glow-blob{
+    position:absolute;
+    width:400px;
+    height:400px;
+    background:radial-gradient(circle,rgba(155,89,255,.35),transparent 70%);
+    border-radius:50%;
+    top:-100px;
+    right:-100px;
+    filter:blur(40px);
+    animation:float 6s ease-in-out infinite;
+}
+
+@keyframes float{
+    0%,100%{ transform:translate(0,0); }
+    50%{ transform:translate(-30px,40px); }
+}
+
+.close-hint{
+    position:absolute;
+    bottom:40px;
+    color:#aaa;
+    font-size:14px;
+    opacity:0;
+    transition:.4s .6s;
+    letter-spacing:1px;
+}
+
+.nav-overlay.open .close-hint{
+    opacity:1;
+}
+
+/* HERO */
+
+.main_content{
+    text-align:center;
+    padding:80px 20px;
+    background: #0f0f0f;
+}
+
+.main_content h1{
+    font-size:3rem;
+    margin-bottom:15px;
+}
+
+.main_content h5{
+    font-size:1.2rem;
+    color:#cfcfcf;
+    margin-bottom:30px;
+}
+
+/* SEARCH BAR */
+
+.search-bar{
+    width:450px;
+    max-width:90%;
+    margin:auto;
+    display:flex;
+    align-items:center;
+    background:rgba(8, 8, 8, 0.12);
+    padding:12px 20px;
+    border-radius:50px;
+    backdrop-filter:blur(8px);
+}
+
+.search-bar input{
+    flex:1;
+    background:transparent;
+    border:none;
+    outline:none;
+    color:white;
+    font-size:16px;
+}
+
+.search-bar span{
+    font-size:22px;
+}
+
+/* CARDS */
+
+.cards{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:30px;
+    padding:30px;
+}
+
+.card-link{
+    text-decoration:none;
+    color:white;
+}
+
+.card{
+    position:relative;
+    width:320px;
+    height:450px;
+    border-radius:20px;
+    overflow:hidden;
+    background:#111;
+    box-shadow:0 5px 20px rgba(255,255,255,0.08);
+    transition:.4s;
+}
+
+.card:hover{
+    transform:translateY(-10px);
+    box-shadow:0 0 25px rgba(132,0,255,.8);
+}
+
+.card img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    filter:brightness(60%) blur(1px);
+    transition:.4s;
+}
+
+.card:hover img{
+    transform:scale(1.08);
+    filter:brightness(80%);
+}
+
+.card::after{
+    content:"";
+    position:absolute;
+    bottom:0;
+    left:0;
+    width:100%;
+    height:45%;
+    background:linear-gradient(transparent, rgba(0,0,0,.95));
+}
+
+/* TEXT ON IMAGE */
+
+.card-content{
+    position:absolute;
+    bottom:20px;
+    left:20px;
+    right:20px;
+    z-index:10;
+}
+
+.card-content h2{
+    font-size:2rem;
+    margin-bottom:10px;
+}
+
+.card-content p{
+    color:#d5d5d5;
+    font-size:16px;
+    line-height:1.5;
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+    header{
+        padding:18px 20px;
+    }
+
+    nav a{
+        font-size:1.6rem;
+    }
+
+    .main_content h1{
+        font-size:2rem;
+    }
+
+    .card{
+        width:90%;
+        max-width:320px;
+    }
+}
+</style>
+
+</head>
+
+<body>
+
+<header>
+    <div class="logo">APex GameZ</div>
+
+    <div class="menu-toggle" id="menuToggle" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+</header>
+
+<div class="nav-overlay" id="navOverlay">
+    <div class="glow-blob"></div>
+    <nav>
+        <a href="main.html"><span class="icon">🏠</span>Home</a>
+        <a href="game.html"><span class="icon">🎮</span>Game</a>
+        <a href="leaderboard.html"><span class="icon">🏆</span>Leaderboard</a>
+        <a href="about.html"><span class="icon">ℹ️</span>About</a>
+        <a href="profile.html"><span class="icon">👤</span>Profile</a>
+        <a href="login.html"><span class="icon">🚪</span>Logout</a>
+    </nav>
+    <div class="close-hint">tap anywhere outside to close</div>
+</div>
+
+<section class="main_content">
+    <h1>Welcome to the Main Page</h1>
+    <h5>This is the main content of the page.</h5>
+
+<div class="search-bar">
+    <input type="text" placeholder="Search games...">
+    <span>🔍</span>
+</div>
+
+
+</section>
+
+<section class="cards">
+
+
+<a href="number.html" class="card-link">
+    <div class="card">
+        <img src="Number.jpeg" alt="Number Game">
+
+        <div class="card-content">
+            <h2>Number Guessing Game</h2>
+            <p>Guess the hidden number and test your luck.</p>
+        </div>
+    </div>
+</a>
+
+<a href="snak.html" class="card-link">
+    <div class="card">
+        <img src="snake.jpg" alt="Snake Game">
+
+        <div class="card-content">
+            <h2>Snake Game</h2>
+            <p>Control the snake and grow as long as possible.</p>
+        </div>
+    </div>
+</a>
+
+<a href="color.html" class="card-link">
+    <div class="card">
+        <img src="color.jpg" alt="Color Game">
+
+        <div class="card-content">
+            <h2>Color Game</h2>
+            <p>Match the colors and score high points.</p>
+        </div>
+    </div>
+</a>
+
+
+</section>
+
+<script>
+const menuToggle = document.getElementById('menuToggle');
+const navOverlay = document.getElementById('navOverlay');
+
+function toggleMenu(){
+    menuToggle.classList.toggle('active');
+    navOverlay.classList.toggle('open');
+}
+
+// close when clicking outside the nav links (on the overlay background)
+navOverlay.addEventListener('click', (e)=>{
+    if(e.target === navOverlay || e.target.classList.contains('glow-blob')){
+        menuToggle.classList.remove('active');
+        navOverlay.classList.remove('open');
+    }
+});
+
+// close when a link is clicked
+document.querySelectorAll('nav a').forEach(link=>{
+    link.addEventListener('click', ()=>{
+        menuToggle.classList.remove('active');
+        navOverlay.classList.remove('open');
+    });
+});
+
+// close on Escape key
+document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape'){
+        menuToggle.classList.remove('active');
+        navOverlay.classList.remove('open');
+    }
+});
+</script>
+
+</body>
+</html>
