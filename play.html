@@ -89,6 +89,34 @@ body::after{
     transform:scale(1.1) rotate(-8deg);
 }
 
+/* Sound Toggle */
+
+.sound-btn{
+    position:absolute;
+    top:20px;
+    right:20px;
+    width:55px;
+    height:55px;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:white;
+    font-size:22px;
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,0.15);
+    transition:0.3s;
+    z-index:10;
+    cursor:pointer;
+}
+
+.sound-btn:hover{
+    background:linear-gradient(135deg,#7b2fff,#2fb8ff);
+    box-shadow:0 0 25px rgba(47,184,255,.7);
+    transform:scale(1.1);
+}
+
 /* Game Box */
 
 .game-box{
@@ -112,8 +140,6 @@ body::after{
     border-radius:28px;
     padding:2px;
     background:conic-gradient(from 0deg,#ff2fd0,#7b2fff,#2fb8ff,#ff2fd0);
-    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
-    -webkit-mask-composite:xor;
     mask-composite:exclude;
     opacity:.7;
     animation:spin 1.6s ease-in-out 1 forwards;
@@ -191,6 +217,19 @@ h1{
     background:rgba(255,255,255,0.1);
 }
 
+#guessInput.shake{
+    animation:shake .4s;
+    border-color:#ef4444;
+}
+
+@keyframes shake{
+    0%,100%{ transform:translateX(0); }
+    20%{ transform:translateX(-8px); }
+    40%{ transform:translateX(8px); }
+    60%{ transform:translateX(-6px); }
+    80%{ transform:translateX(6px); }
+}
+
 /* Guess Button */
 
 .guess-btn{
@@ -229,6 +268,16 @@ h1{
     transition:.3s;
 }
 
+#message.pop{
+    animation:pop .35s ease;
+}
+
+@keyframes pop{
+    0%{ transform:scale(.85); opacity:.3; }
+    60%{ transform:scale(1.08); opacity:1; }
+    100%{ transform:scale(1); }
+}
+
 /* Attempts */
 
 #attempts{
@@ -236,6 +285,93 @@ h1{
     color:#ffe066;
     font-size:16px;
     letter-spacing:.5px;
+}
+
+/* Progress Bar (attempts remaining) */
+
+.progress-wrap{
+    margin-top:14px;
+    width:100%;
+    height:8px;
+    border-radius:10px;
+    background:rgba(255,255,255,0.1);
+    overflow:hidden;
+}
+
+#progressBar{
+    height:100%;
+    width:100%;
+    border-radius:10px;
+    background:linear-gradient(90deg,#22c55e,#facc15,#ef4444);
+    transition:width .4s ease;
+}
+
+/* Guess History */
+
+.history-wrap{
+    margin-top:20px;
+    text-align:left;
+}
+
+.history-title{
+    font-size:13px;
+    color:#94a3b8;
+    letter-spacing:.5px;
+    margin-bottom:8px;
+    text-transform:uppercase;
+}
+
+#historyList{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    max-height:110px;
+    overflow-y:auto;
+    padding-right:4px;
+}
+
+#historyList::-webkit-scrollbar{
+    width:5px;
+}
+
+#historyList::-webkit-scrollbar-thumb{
+    background:rgba(255,255,255,.2);
+    border-radius:10px;
+}
+
+.chip{
+    padding:7px 12px;
+    border-radius:20px;
+    font-size:14px;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    animation:chipIn .3s ease;
+    white-space:nowrap;
+}
+
+@keyframes chipIn{
+    0%{ transform:scale(.5); opacity:0; }
+    100%{ transform:scale(1); opacity:1; }
+}
+
+.chip.low{
+    background:rgba(56,189,248,0.18);
+    color:#38bdf8;
+    border:1px solid rgba(56,189,248,.4);
+}
+
+.chip.high{
+    background:rgba(239,68,68,0.18);
+    color:#ef4444;
+    border:1px solid rgba(239,68,68,.4);
+}
+
+.chip.correct{
+    background:rgba(34,197,94,0.2);
+    color:#22c55e;
+    border:1px solid rgba(34,197,94,.5);
 }
 
 /* Restart Button */
@@ -262,6 +398,25 @@ h1{
     filter:brightness(1.1);
 }
 
+/* Confetti */
+
+.confetti{
+    position:fixed;
+    top:-10px;
+    width:8px;
+    height:14px;
+    z-index:999;
+    pointer-events:none;
+    animation:fall linear forwards;
+}
+
+@keyframes fall{
+    to{
+        transform:translateY(110vh) rotate(600deg);
+        opacity:.9;
+    }
+}
+
 /* Mobile */
 
 @media(max-width:500px){
@@ -271,7 +426,8 @@ h1{
         padding:28px 20px;
     }
 
-    .back-btn{
+    .back-btn,
+    .sound-btn{
         width:50px;
         height:50px;
         font-size:24px;
@@ -292,6 +448,12 @@ h1{
 <a href="number.html" class="back-btn">
     <i class="bi bi-arrow-left"></i>
 </a>
+
+<!-- Sound Toggle -->
+
+<div class="sound-btn" id="soundToggle" onclick="toggleSound()">
+    <i class="bi bi-volume-up-fill" id="soundIcon"></i>
+</div>
 
 <!-- Game Container -->
 
@@ -323,6 +485,15 @@ h1{
     <p id="attempts">
         Attempts Left: 0
     </p>
+
+    <div class="progress-wrap">
+        <div id="progressBar"></div>
+    </div>
+
+    <div class="history-wrap">
+        <div class="history-title">Previous Guesses</div>
+        <div id="historyList"></div>
+    </div>
 
     <button
         id="restartBtn"
