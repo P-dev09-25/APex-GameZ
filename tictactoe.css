@@ -1,0 +1,278 @@
+/* ============================================================
+ * tictactoe.css
+ * Self-contained styling for the embeddable Tic-Tac-Toe widget.
+ * All rules are scoped under .ttt-widget so they can't leak into
+ * or collide with the rest of the host page's styles.
+ * ============================================================ */
+
+.ttt-widget {
+  --ttt-bg: #14171a;
+  --ttt-panel: #1c2126;
+  --ttt-panel-raised: #232a30;
+  --ttt-grid-line: #333b42;
+  --ttt-text: #ece8e1;
+  --ttt-muted: #8a9199;
+  --ttt-x: #f2a65a;
+  --ttt-x-dim: #6b5636;
+  --ttt-o: #4fb6a8;
+  --ttt-o-dim: #2e4c48;
+  --ttt-win: #f2c46d;
+  --ttt-lose: #d97757;
+  --ttt-radius: 18px;
+
+  --ttt-font-display: "Space Grotesk", "Segoe UI", sans-serif;
+  --ttt-font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 28px;
+  background: var(--ttt-panel);
+  border: 1px solid var(--ttt-grid-line);
+  border-radius: var(--ttt-radius);
+  font-family: var(--ttt-font-display);
+  color: var(--ttt-text);
+  box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.6);
+}
+
+.ttt-widget *,
+.ttt-widget *::before,
+.ttt-widget *::after {
+  box-sizing: border-box;
+}
+
+/* ---------- Header ---------- */
+
+.ttt-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.ttt-title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ttt-muted);
+  margin: 0;
+}
+
+.ttt-score {
+  font-family: var(--ttt-font-mono);
+  font-size: 12px;
+  color: var(--ttt-muted);
+  letter-spacing: 0.04em;
+}
+
+.ttt-score span {
+  color: var(--ttt-text);
+}
+
+/* ---------- Mode selector (segmented control) ---------- */
+
+.ttt-mode {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  background: var(--ttt-bg);
+  border: 1px solid var(--ttt-grid-line);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 16px;
+}
+
+.ttt-mode button {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--ttt-muted);
+  font-family: var(--ttt-font-mono);
+  font-size: 12.5px;
+  letter-spacing: 0.03em;
+  padding: 9px 8px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.ttt-mode button:hover {
+  color: var(--ttt-text);
+}
+
+.ttt-mode button.is-active {
+  background: var(--ttt-panel-raised);
+  color: var(--ttt-text);
+  box-shadow: inset 0 0 0 1px var(--ttt-grid-line);
+}
+
+.ttt-mode button:focus-visible,
+.ttt-restart:focus-visible,
+.ttt-cell:focus-visible {
+  outline: 2px solid var(--ttt-o);
+  outline-offset: 2px;
+}
+
+/* ---------- Status line ---------- */
+
+.ttt-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  margin-bottom: 14px;
+  font-size: 14.5px;
+  color: var(--ttt-muted);
+}
+
+.ttt-status .ttt-turn-mark {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+
+.ttt-status.is-win-you,
+.ttt-status.is-win-x,
+.ttt-status.is-win-o {
+  color: var(--ttt-win);
+  font-weight: 600;
+}
+
+.ttt-status.is-lose {
+  color: var(--ttt-lose);
+  font-weight: 600;
+}
+
+.ttt-status.is-draw {
+  color: var(--ttt-text);
+  font-weight: 600;
+}
+
+/* ---------- Board ---------- */
+
+.ttt-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 8px;
+  aspect-ratio: 1 / 1;
+  background: var(--ttt-grid-line);
+  border-radius: 14px;
+  padding: 8px;
+  overflow: hidden;
+}
+
+.ttt-cell {
+  appearance: none;
+  border: none;
+  background: var(--ttt-bg);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 14%;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.ttt-cell:hover:not(:disabled) {
+  background: var(--ttt-panel-raised);
+}
+
+.ttt-cell:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.ttt-cell:disabled {
+  cursor: default;
+}
+
+.ttt-cell.is-win {
+  background: rgba(242, 196, 109, 0.12);
+}
+
+.ttt-cell svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.ttt-mark-path {
+  fill: none;
+  stroke-width: 9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ttt-mark-x .ttt-mark-path {
+  stroke: var(--ttt-x);
+}
+
+.ttt-mark-o .ttt-mark-path {
+  stroke: var(--ttt-o);
+}
+
+.ttt-mark-draw-on .ttt-mark-path {
+  animation: ttt-draw 0.32s ease forwards;
+}
+
+@keyframes ttt-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ---------- Footer ---------- */
+
+.ttt-footer {
+  margin-top: 18px;
+  display: flex;
+  justify-content: center;
+}
+
+.ttt-restart {
+  appearance: none;
+  border: 1px solid var(--ttt-grid-line);
+  background: var(--ttt-panel-raised);
+  color: var(--ttt-text);
+  font-family: var(--ttt-font-mono);
+  font-size: 12.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 11px 22px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 0.18s ease, transform 0.1s ease;
+}
+
+.ttt-restart:hover {
+  border-color: var(--ttt-o);
+}
+
+.ttt-restart:active {
+  transform: scale(0.97);
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .ttt-mark-draw-on .ttt-mark-path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+  .ttt-cell,
+  .ttt-restart,
+  .ttt-mode button {
+    transition: none;
+  }
+}
+
+/* ---------- Small widths ---------- */
+
+@media (max-width: 380px) {
+  .ttt-widget {
+    padding: 18px;
+  }
+}

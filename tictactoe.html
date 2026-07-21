@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tic-Tac-Toe</title>
+
+<!-- Demo page wrapper only — remove this <head> block when embedding
+     the widget in your own site and keep just the font links + the
+     tictactoe.css / tictactoe.js includes below. -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+  rel="stylesheet"
+/>
+<link rel="stylesheet" href="tictactoe.css" />
+
+<style>
+  /* Demo-page-only styling so the widget has somewhere to sit.
+     Not part of the reusable component. */
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0c0e10;
+    padding: 24px;
+    font-family: "Space Grotesk", sans-serif;
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     Embeddable widget — copy this whole <div id="ttt-widget"> block
+     into any page, alongside tictactoe.css / tictactoe.js / tictactoe.wasm.
+     ============================================================ -->
+<div class="ttt-widget" id="ttt-widget">
+
+  <div class="ttt-header">
+    <p class="ttt-title">Tic&nbsp;&middot;&nbsp;Tac&nbsp;&middot;&nbsp;Toe</p>
+    <div class="ttt-score" aria-live="polite"></div>
+  </div>
+
+  <div class="ttt-mode" role="group" aria-label="Game mode">
+    <button type="button" data-mode="1" class="is-active">Vs&nbsp;Computer</button>
+    <button type="button" data-mode="0">Two&nbsp;Players</button>
+  </div>
+
+  <div class="ttt-status" aria-live="polite"></div>
+
+  <div class="ttt-board" role="grid" aria-label="Tic-tac-toe board">
+    <button type="button" class="ttt-cell" data-index="0" aria-label="Empty cell 1"></button>
+    <button type="button" class="ttt-cell" data-index="1" aria-label="Empty cell 2"></button>
+    <button type="button" class="ttt-cell" data-index="2" aria-label="Empty cell 3"></button>
+    <button type="button" class="ttt-cell" data-index="3" aria-label="Empty cell 4"></button>
+    <button type="button" class="ttt-cell" data-index="4" aria-label="Empty cell 5"></button>
+    <button type="button" class="ttt-cell" data-index="5" aria-label="Empty cell 6"></button>
+    <button type="button" class="ttt-cell" data-index="6" aria-label="Empty cell 7"></button>
+    <button type="button" class="ttt-cell" data-index="7" aria-label="Empty cell 8"></button>
+    <button type="button" class="ttt-cell" data-index="8" aria-label="Empty cell 9"></button>
+  </div>
+
+  <div class="ttt-footer">
+    <button type="button" class="ttt-restart">Restart</button>
+  </div>
+
+</div>
+
+<script src="tictactoe.js"></script>
+</body>
+</html>
