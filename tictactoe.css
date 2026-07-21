@@ -1,14 +1,20 @@
 /* ============================================================
  * tictactoe.css
- * Self-contained styling for the embeddable Tic-Tac-Toe widget.
- * All rules are scoped under .ttt-widget so they can't leak into
- * or collide with the rest of the host page's styles.
+ * Page shell + widget theme.
+ *
+ * IMPORTANT: every class name the game engine (tictactoe.js)
+ * reads or toggles is preserved exactly: .ttt-board .ttt-cell
+ * .ttt-status .ttt-restart .ttt-mode .ttt-score data-index
+ * data-mode is-active is-win is-win-you is-win-x is-win-o
+ * is-lose is-draw .ttt-mark-x/o .ttt-mark-draw-on .ttt-mark-path
+ * Only new wrapper/decoration classes were added around them.
  * ============================================================ */
 
-.ttt-widget {
-  --ttt-bg: #14171a;
+:root {
+  --ttt-bg: #0b0d0f;
   --ttt-panel: #1c2126;
   --ttt-panel-raised: #232a30;
+  --ttt-panel-glass: rgba(28, 33, 38, 0.72);
   --ttt-grid-line: #333b42;
   --ttt-text: #ece8e1;
   --ttt-muted: #8a9199;
@@ -18,22 +24,214 @@
   --ttt-o-dim: #2e4c48;
   --ttt-win: #f2c46d;
   --ttt-lose: #d97757;
-  --ttt-radius: 18px;
+  --ttt-radius: 22px;
 
   --ttt-font-display: "Space Grotesk", "Segoe UI", sans-serif;
   --ttt-font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+}
 
+/* ============================================================
+ * Page shell
+ * ============================================================ */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body.ttt-page {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--ttt-bg);
+  color: var(--ttt-text);
+  font-family: var(--ttt-font-display);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Ambient drifting X / O watermarks — the page's one signature
+   flourish, pulled straight from the game's own iconography
+   instead of a generic decorative shape. */
+.ttt-ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ttt-ambient span {
+  position: absolute;
+  font-family: var(--ttt-font-display);
+  font-weight: 700;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--ttt-grid-line);
+  opacity: 0.5;
+  animation: ttt-drift linear infinite;
+  will-change: transform;
+}
+
+.ttt-ambient span:nth-child(1) { top: 8%;  left: 6%;  font-size: clamp(60px, 14vw, 160px); animation-duration: 46s; -webkit-text-stroke-color: var(--ttt-x-dim); }
+.ttt-ambient span:nth-child(2) { top: 62%; left: 82%; font-size: clamp(50px, 12vw, 130px); animation-duration: 38s; animation-delay: -6s; -webkit-text-stroke-color: var(--ttt-o-dim); }
+.ttt-ambient span:nth-child(3) { top: 78%; left: 10%; font-size: clamp(40px, 9vw, 100px);  animation-duration: 52s; animation-delay: -18s; -webkit-text-stroke-color: var(--ttt-x-dim); }
+.ttt-ambient span:nth-child(4) { top: 4%;  left: 78%; font-size: clamp(36px, 8vw, 90px);   animation-duration: 34s; animation-delay: -10s; -webkit-text-stroke-color: var(--ttt-o-dim); }
+
+@keyframes ttt-drift {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50%  { transform: translate3d(3%, -4%, 0) rotate(6deg); }
+  100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+}
+
+.ttt-glow {
+  position: fixed;
+  inset: -20%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(38vmax 38vmax at 18% 20%, rgba(242, 166, 90, 0.10), transparent 60%),
+    radial-gradient(42vmax 42vmax at 84% 78%, rgba(79, 182, 168, 0.10), transparent 60%);
+  animation: ttt-glow-shift 22s ease-in-out infinite alternate;
+}
+
+@keyframes ttt-glow-shift {
+  from { transform: translate3d(-2%, 0, 0) scale(1); }
+  to   { transform: translate3d(2%, 2%, 0) scale(1.06); }
+}
+
+/* ============================================================
+ * Header
+ * ============================================================ */
+
+.ttt-page-header {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 560px;
+  padding: clamp(16px, 4vw, 28px) clamp(16px, 4vw, 20px) 4px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  animation: ttt-fade-down 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.ttt-home-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--ttt-muted);
+  font-family: var(--ttt-font-mono);
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 9px 16px 9px 12px;
+  border: 1px solid var(--ttt-grid-line);
+  border-radius: 999px;
+  background: var(--ttt-panel-glass);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: color 0.18s ease, border-color 0.18s ease, transform 0.15s ease, background 0.18s ease;
+}
+
+.ttt-home-btn svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  transition: transform 0.18s ease;
+}
+
+.ttt-home-btn:hover {
+  color: var(--ttt-text);
+  border-color: var(--ttt-o);
+  background: var(--ttt-panel-raised);
+}
+
+.ttt-home-btn:hover svg {
+  transform: translateX(-3px);
+}
+
+.ttt-home-btn:active {
+  transform: scale(0.96);
+}
+
+.ttt-home-btn:focus-visible {
+  outline: 2px solid var(--ttt-o);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+ * Hero
+ * ============================================================ */
+
+.ttt-hero {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: clamp(10px, 3vw, 18px) 20px clamp(20px, 4vw, 32px);
+  animation: ttt-fade-down 0.7s 0.05s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.ttt-hero h1 {
+  margin: 0;
+  font-size: clamp(28px, 6vw, 42px);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  background: linear-gradient(100deg, var(--ttt-x) 0%, var(--ttt-text) 45%, var(--ttt-o) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.ttt-hero p {
+  margin: 6px 0 0;
+  color: var(--ttt-muted);
+  font-family: var(--ttt-font-mono);
+  font-size: clamp(11px, 2.4vw, 13px);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@keyframes ttt-fade-down {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+ * Widget card
+ * ============================================================ */
+
+.ttt-widget {
+  position: relative;
+  z-index: 1;
   box-sizing: border-box;
   width: 100%;
   max-width: 420px;
-  margin: 0 auto;
-  padding: 28px;
-  background: var(--ttt-panel);
+  margin: 0 auto clamp(24px, 6vw, 48px);
+  padding: clamp(20px, 5vw, 30px);
+  background: var(--ttt-panel-glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border: 1px solid var(--ttt-grid-line);
   border-radius: var(--ttt-radius);
   font-family: var(--ttt-font-display);
   color: var(--ttt-text);
-  box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.6);
+  box-shadow:
+    0 30px 70px -28px rgba(0, 0, 0, 0.65),
+    0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+  animation: ttt-card-in 0.6s 0.1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes ttt-card-in {
+  from { opacity: 0; transform: translateY(18px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .ttt-widget *,
@@ -42,17 +240,19 @@
   box-sizing: border-box;
 }
 
-/* ---------- Header ---------- */
+/* ---------- Header row ---------- */
 
 .ttt-header {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   margin-bottom: 18px;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .ttt-title {
-  font-size: 15px;
+  font-size: clamp(13px, 3vw, 15px);
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -62,13 +262,15 @@
 
 .ttt-score {
   font-family: var(--ttt-font-mono);
-  font-size: 12px;
+  font-size: clamp(11px, 2.6vw, 12px);
   color: var(--ttt-muted);
   letter-spacing: 0.04em;
+  transition: color 0.2s ease;
 }
 
 .ttt-score span {
   color: var(--ttt-text);
+  font-weight: 600;
 }
 
 /* ---------- Mode selector (segmented control) ---------- */
@@ -79,7 +281,7 @@
   gap: 6px;
   background: var(--ttt-bg);
   border: 1px solid var(--ttt-grid-line);
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 4px;
   margin-bottom: 16px;
 }
@@ -90,22 +292,27 @@
   background: transparent;
   color: var(--ttt-muted);
   font-family: var(--ttt-font-mono);
-  font-size: 12.5px;
+  font-size: clamp(11px, 2.8vw, 12.5px);
   letter-spacing: 0.03em;
-  padding: 9px 8px;
-  border-radius: 9px;
+  padding: 11px 8px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background 0.18s ease, color 0.18s ease;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .ttt-mode button:hover {
   color: var(--ttt-text);
 }
 
+.ttt-mode button:active {
+  transform: scale(0.97);
+}
+
 .ttt-mode button.is-active {
   background: var(--ttt-panel-raised);
   color: var(--ttt-text);
-  box-shadow: inset 0 0 0 1px var(--ttt-grid-line);
+  box-shadow: inset 0 0 0 1px var(--ttt-grid-line), 0 4px 14px -6px rgba(0, 0, 0, 0.5);
 }
 
 .ttt-mode button:focus-visible,
@@ -120,11 +327,16 @@
 .ttt-status {
   display: flex;
   align-items: center;
-  gap: 8px;
-  min-height: 28px;
+  gap: 9px;
+  min-height: 30px;
   margin-bottom: 14px;
-  font-size: 14.5px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid transparent;
+  font-size: clamp(13px, 3.2vw, 14.5px);
   color: var(--ttt-muted);
+  transition: color 0.25s ease, background 0.25s ease, border-color 0.25s ease;
 }
 
 .ttt-status .ttt-turn-mark {
@@ -138,16 +350,39 @@
 .ttt-status.is-win-o {
   color: var(--ttt-win);
   font-weight: 600;
+  background: rgba(242, 196, 109, 0.08);
+  border-color: rgba(242, 196, 109, 0.25);
+  animation: ttt-status-pop 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .ttt-status.is-lose {
   color: var(--ttt-lose);
   font-weight: 600;
+  background: rgba(217, 119, 87, 0.08);
+  border-color: rgba(217, 119, 87, 0.25);
+  animation: ttt-status-pop 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .ttt-status.is-draw {
   color: var(--ttt-text);
   font-weight: 600;
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--ttt-grid-line);
+  animation: ttt-status-shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+@keyframes ttt-status-pop {
+  0%   { transform: scale(0.94); }
+  60%  { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+@keyframes ttt-status-shake {
+  0%, 100% { transform: translateX(0); }
+  20%      { transform: translateX(-4px); }
+  40%      { transform: translateX(4px); }
+  60%      { transform: translateX(-3px); }
+  80%      { transform: translateX(3px); }
 }
 
 /* ---------- Board ---------- */
@@ -156,11 +391,11 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
-  gap: 8px;
+  gap: clamp(6px, 2vw, 8px);
   aspect-ratio: 1 / 1;
   background: var(--ttt-grid-line);
-  border-radius: 14px;
-  padding: 8px;
+  border-radius: 16px;
+  padding: clamp(6px, 2vw, 8px);
   overflow: hidden;
 }
 
@@ -168,21 +403,30 @@
   appearance: none;
   border: none;
   background: var(--ttt-bg);
-  border-radius: 8px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   padding: 14%;
-  transition: background 0.15s ease, transform 0.1s ease;
+  transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.2s ease;
+  animation: ttt-cell-in 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--ttt-cell-i, 0) * 35ms);
+  -webkit-tap-highlight-color: transparent;
+}
+
+@keyframes ttt-cell-in {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
 }
 
 .ttt-cell:hover:not(:disabled) {
   background: var(--ttt-panel-raised);
+  box-shadow: 0 0 0 1px var(--ttt-grid-line) inset;
 }
 
 .ttt-cell:active:not(:disabled) {
-  transform: scale(0.96);
+  transform: scale(0.94);
 }
 
 .ttt-cell:disabled {
@@ -190,7 +434,13 @@
 }
 
 .ttt-cell.is-win {
-  background: rgba(242, 196, 109, 0.12);
+  background: rgba(242, 196, 109, 0.14);
+  animation: ttt-win-pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes ttt-win-pulse {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(242, 196, 109, 0.35) inset; }
+  50%      { box-shadow: 0 0 0 1px rgba(242, 196, 109, 0.7) inset, 0 0 18px rgba(242, 196, 109, 0.25); }
 }
 
 .ttt-cell svg {
@@ -204,6 +454,8 @@
   stroke-width: 9;
   stroke-linecap: round;
   stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
 }
 
 .ttt-mark-x .ttt-mark-path {
@@ -212,6 +464,11 @@
 
 .ttt-mark-o .ttt-mark-path {
   stroke: var(--ttt-o);
+}
+
+.ttt-mark-x .ttt-mark-path,
+.ttt-mark-o .ttt-mark-path {
+  animation: ttt-draw 0.28s ease forwards;
 }
 
 .ttt-mark-draw-on .ttt-mark-path {
@@ -234,45 +491,119 @@
 
 .ttt-restart {
   appearance: none;
-  border: 1px solid var(--ttt-grid-line);
-  background: var(--ttt-panel-raised);
-  color: var(--ttt-text);
+  border: 1px solid transparent;
+  background: linear-gradient(135deg, var(--ttt-x), var(--ttt-o));
+  color: #14171a;
   font-family: var(--ttt-font-mono);
-  font-size: 12.5px;
+  font-weight: 600;
+  font-size: clamp(12px, 3vw, 12.5px);
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  padding: 11px 22px;
-  border-radius: 10px;
+  padding: 12px 26px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: border-color 0.18s ease, transform 0.1s ease;
+  min-height: 44px;
+  transition: filter 0.18s ease, transform 0.12s ease, box-shadow 0.18s ease;
+  box-shadow: 0 10px 26px -12px rgba(242, 166, 90, 0.45);
+  -webkit-tap-highlight-color: transparent;
 }
 
 .ttt-restart:hover {
-  border-color: var(--ttt-o);
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px -12px rgba(242, 166, 90, 0.55);
 }
 
 .ttt-restart:active {
-  transform: scale(0.97);
+  transform: scale(0.97) translateY(0);
+}
+
+/* ============================================================
+ * Celebration overlay (confetti canvas + draw banner)
+ * ============================================================ */
+
+.ttt-celebrate-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+}
+
+.ttt-draw-banner {
+  position: fixed;
+  left: 50%;
+  top: 18%;
+  transform: translate(-50%, -12px);
+  z-index: 6;
+  background: var(--ttt-panel-raised);
+  border: 1px solid var(--ttt-grid-line);
+  color: var(--ttt-text);
+  font-family: var(--ttt-font-mono);
+  font-size: clamp(12px, 3vw, 14px);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 12px 22px;
+  border-radius: 999px;
+  box-shadow: 0 20px 40px -16px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.ttt-draw-banner.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
 }
 
 /* ---------- Reduced motion ---------- */
 
 @media (prefers-reduced-motion: reduce) {
-  .ttt-mark-draw-on .ttt-mark-path {
+  .ttt-mark-draw-on .ttt-mark-path,
+  .ttt-mark-x .ttt-mark-path,
+  .ttt-mark-o .ttt-mark-path {
     animation: none;
     stroke-dashoffset: 0;
   }
   .ttt-cell,
   .ttt-restart,
-  .ttt-mode button {
-    transition: none;
+  .ttt-mode button,
+  .ttt-home-btn,
+  .ttt-widget,
+  .ttt-hero,
+  .ttt-page-header,
+  .ttt-status,
+  .ttt-ambient span,
+  .ttt-glow {
+    animation: none !important;
+    transition: none !important;
   }
 }
 
 /* ---------- Small widths ---------- */
 
+@media (max-width: 480px) {
+  .ttt-page-header {
+    justify-content: flex-start;
+  }
+  .ttt-home-btn {
+    font-size: 11.5px;
+    padding: 8px 14px 8px 10px;
+  }
+}
+
 @media (max-width: 380px) {
   .ttt-widget {
-    padding: 18px;
+    padding: 16px;
+  }
+  .ttt-mark-path {
+    stroke-width: 10;
+  }
+}
+
+@media (min-width: 900px) {
+  .ttt-widget {
+    max-width: 460px;
   }
 }
