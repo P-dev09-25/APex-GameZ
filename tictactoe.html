@@ -2,12 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Tic-Tac-Toe</title>
 
-<!-- Demo page wrapper only — remove this <head> block when embedding
-     the widget in your own site and keep just the font links + the
-     tictactoe.css / tictactoe.js includes below. -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link
@@ -15,27 +12,39 @@
   rel="stylesheet"
 />
 <link rel="stylesheet" href="tictactoe.css" />
-
-<style>
-  /* Demo-page-only styling so the widget has somewhere to sit.
-     Not part of the reusable component. */
-  body {
-    margin: 0;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #0c0e10;
-    padding: 24px;
-    font-family: "Space Grotesk", sans-serif;
-  }
-</style>
 </head>
-<body>
+<body class="ttt-page">
+
+<!-- Ambient decoration — purely visual, sits behind everything -->
+<div class="ttt-glow" aria-hidden="true"></div>
+<div class="ttt-ambient" aria-hidden="true">
+  <span>X</span>
+  <span>O</span>
+  <span>X</span>
+  <span>O</span>
+</div>
+
+<header class="ttt-page-header">
+  <!-- Update href to point at your project's home page -->
+  <a class="ttt-home-btn" href="/" aria-label="Back to home">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="19" y1="12" x2="5" y2="12"></line>
+      <polyline points="12 19 5 12 12 5"></polyline>
+    </svg>
+    Back to Home
+  </a>
+</header>
+
+<div class="ttt-hero">
+  <h1>Tic &middot; Tac &middot; Toe</h1>
+  <p>Three in a row wins</p>
+</div>
 
 <!-- ============================================================
      Embeddable widget — copy this whole <div id="ttt-widget"> block
-     into any page, alongside tictactoe.css / tictactoe.js / tictactoe.wasm.
+     into any page, alongside tictactoe.css / tictactoe.js /
+     celebration.js / tictactoe.wasm. Class names and structure are
+     unchanged from the original so the game engine keeps working.
      ============================================================ -->
 <div class="ttt-widget" id="ttt-widget">
 
@@ -70,5 +79,6 @@
 </div>
 
 <script src="tictactoe.js"></script>
+<script src="celebration.js"></script>
 </body>
 </html>
