@@ -1,31 +1,277 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>splash</title>
-    <script src="script.js"></script>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>APEX GAMEZ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+--cyan:#2be6ff;
+--violet:#8b5cf6;
+--magenta:#c026d3;
+--ink:#eaf0ff;
+--ink-dim:#9aa3c2;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{
+font-family:'Poppins',sans-serif;
+background:#020103;
+min-height:100vh;min-height:100dvh;
+position:relative;
+display:flex;align-items:center;justify-content:center;
+color:var(--ink);
+}
+
+/* ---------- scattered neon shards ---------- */
+.shards{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.shard{position:absolute;clip-path:polygon(50% 0,0 100%,100% 100%);filter:blur(.3px);animation:driftShard 7s ease-in-out infinite;}
+.streak{position:absolute;background:linear-gradient(180deg,transparent,var(--cyan) 35%,var(--violet) 70%,transparent);
+filter:blur(.5px);box-shadow:0 0 18px rgba(43,230,255,.6);border-radius:4px;}
+
+.dot{position:absolute;border-radius:50%;animation:twinkle 3.2s ease-in-out infinite;}
+
+/* ---------- hero ---------- */
+.hero{position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;text-align:center;padding:24px;width:100%;max-width:640px;}
+
+.pad{width:clamp(70px,16vw,100px);height:auto;animation:floatY 3.4s ease-in-out infinite;filter:drop-shadow(0 0 14px rgba(43,230,255,.55)) drop-shadow(0 0 22px rgba(139,92,246,.35));}
+
+.title{
+margin-top:22px;
+font-family:'Orbitron',sans-serif;
+font-weight:900;
+font-size:clamp(2.3rem,9vw,3.6rem);
+letter-spacing:2px;
+line-height:1;
+position:relative;
+}
+.title span{display:inline-block;transform:skewX(-6deg);}
+.title .a{color:var(--cyan);text-shadow:0 0 10px rgba(43,230,255,.9),0 0 30px rgba(43,230,255,.5);}
+.title .g{color:var(--violet);text-shadow:0 0 10px rgba(139,92,246,.9),0 0 30px rgba(139,92,246,.5);margin-left:.35ch;}
+.title::after{
+content:"APEX GAMEZ";
+position:absolute;left:0;top:0;width:100%;
+color:var(--magenta);
+opacity:0;
+mix-blend-mode:screen;
+animation:glitch 6s steps(1) infinite;
+letter-spacing:2px;
+}
+
+.tagline{
+margin-top:14px;
+display:flex;align-items:center;gap:14px;
+color:var(--ink-dim);
+font-size:clamp(.68rem,2.3vw,.85rem);
+letter-spacing:4px;
+text-transform:uppercase;
+}
+.tagline i{display:block;width:34px;height:1px;background:linear-gradient(90deg,transparent,var(--cyan));font-style:normal;}
+.tagline i:last-child{background:linear-gradient(90deg,var(--violet),transparent);}
+
+/* ---------- loading ring ---------- */
+.ring-wrap{margin-top:56px;position:relative;width:150px;height:150px;display:flex;align-items:center;justify-content:center;}
+.ring{
+position:absolute;inset:0;border-radius:50%;
+background:conic-gradient(from 0deg,var(--cyan),var(--violet),var(--magenta),var(--cyan));
+-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#fff calc(100% - 3px));
+mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#fff calc(100% - 3px));
+animation:spin 1.6s linear infinite;
+filter:drop-shadow(0 0 10px rgba(43,230,255,.5));
+}
+.ring-orbit{position:absolute;inset:0;animation:spin 1.6s linear infinite;}
+.ring-orbit i{position:absolute;top:-2px;left:50%;width:8px;height:8px;margin-left:-4px;border-radius:50%;
+background:#fff;box-shadow:0 0 10px 3px var(--cyan),0 0 18px 6px rgba(43,230,255,.5);}
+.ring-glow{position:absolute;inset:14px;border-radius:50%;background:radial-gradient(circle,rgba(43,230,255,.08),transparent 70%);}
+.ring-text{position:relative;z-index:2;font-family:'Orbitron',sans-serif;font-size:.72rem;letter-spacing:3px;color:var(--ink);}
+.dots{display:flex;gap:5px;justify-content:center;margin-top:6px;}
+.dots span{width:5px;height:5px;border-radius:50%;background:var(--cyan);animation:blink 1.2s ease-in-out infinite;}
+.dots span:nth-child(2){background:var(--violet);animation-delay:.2s;}
+.dots span:nth-child(3){background:var(--magenta);animation-delay:.4s;}
+
+/* ---------- progress bar (synced to the 4s redirect) ---------- */
+.progress-wrap{margin-top:26px;width:min(78vw,260px);}
+.progress-track{width:100%;height:6px;border-radius:6px;background:rgba(255,255,255,.08);
+box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);overflow:hidden;}
+.progress-fill{
+height:100%;width:0%;border-radius:6px;
+background:linear-gradient(90deg,var(--cyan),var(--violet),var(--magenta));
+box-shadow:0 0 12px rgba(43,230,255,.7);
+animation:fillBar 4s linear forwards;
+}
+.progress-pct{margin-top:8px;font-family:'Orbitron',sans-serif;font-size:.68rem;letter-spacing:2px;color:var(--ink-dim);text-align:right;}
+
+/* ---------- floor / horizon glow ---------- */
+.floor-wrap{position:fixed;left:0;right:0;bottom:0;height:38vh;z-index:1;overflow:hidden;pointer-events:none;perspective:280px;}
+.beam{position:absolute;left:50%;bottom:0;width:3px;height:70%;transform-origin:bottom center;
+background:linear-gradient(to top,rgba(43,230,255,.55),transparent);filter:blur(3px);animation:beamPulse 4s ease-in-out infinite;}
+.grid{
+position:absolute;left:-50%;bottom:-10%;width:200%;height:140%;
+background-image:linear-gradient(rgba(43,230,255,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(139,92,246,.18) 1px,transparent 1px);
+background-size:52px 52px;
+transform:rotateX(72deg);
+mask-image:linear-gradient(to top,#000 15%,transparent 85%);
+-webkit-mask-image:linear-gradient(to top,#000 15%,transparent 85%);
+animation:gridMove 5s linear infinite;
+}
+.horizon-glow{position:absolute;left:50%;bottom:6%;width:70vw;max-width:520px;height:70px;transform:translateX(-50%);
+background:radial-gradient(ellipse at center,rgba(43,230,255,.35),rgba(139,92,246,.18) 45%,transparent 75%);
+filter:blur(14px);}
+
+/* ---------- animations ---------- */
+@keyframes spin{100%{transform:rotate(360deg);}}
+@keyframes floatY{0%,100%{transform:translateY(0);}50%{transform:translateY(-9px);}}
+@keyframes twinkle{0%,100%{opacity:.15;transform:scale(.7);}50%{opacity:.9;transform:scale(1.2);}}
+@keyframes driftShard{0%,100%{transform:translateY(0) rotate(var(--r,0deg));}50%{transform:translateY(-10px) rotate(var(--r,0deg));}}
+@keyframes blink{0%,100%{opacity:.25;transform:scale(.8);}50%{opacity:1;transform:scale(1.15);}}
+@keyframes beamPulse{0%,100%{opacity:.35;}50%{opacity:.75;}}
+@keyframes gridMove{0%{background-position:0 0,0 0;}100%{background-position:0 -52px,-52px 0;}}
+@keyframes fillBar{from{width:0%;}to{width:100%;}}
+@keyframes glitch{
+0%,92%,100%{opacity:0;transform:translate(0,0);}
+93%{opacity:.5;transform:translate(-3px,1px);}
+94%{opacity:0;}
+96%{opacity:.4;transform:translate(3px,-1px);}
+97%{opacity:0;}
+}
+
+@media(prefers-reduced-motion:reduce){
+*{animation-duration:.001ms !important;animation-iteration-count:1 !important;}
+}
+@media(max-width:420px){
+.ring-wrap{width:118px;height:118px;margin-top:42px;}
+.tagline{gap:10px;letter-spacing:3px;}
+}
+</style>
 </head>
 <body>
-    <div id="splash">
-        <div class="loader"></div>
-        <h3>LOADING...</h3>
-    </div>
-    <script>
+
+<div class="shards" id="shards"></div>
+
+<div class="floor-wrap">
+<div class="grid"></div>
+<div class="beam" style="transform:translateX(-50%) rotate(-32deg);"></div>
+<div class="beam" style="transform:translateX(-50%) rotate(-14deg);animation-delay:.5s;"></div>
+<div class="beam" style="transform:translateX(-50%) rotate(4deg);animation-delay:1s;"></div>
+<div class="beam" style="transform:translateX(-50%) rotate(20deg);animation-delay:1.5s;"></div>
+<div class="beam" style="transform:translateX(-50%) rotate(34deg);animation-delay:2s;"></div>
+<div class="horizon-glow"></div>
+</div>
+
+<div class="hero">
+<svg class="pad" viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="padGrad" x1="0" y1="0" x2="120" y2="80" gradientUnits="userSpaceOnUse">
+<stop offset="0" stop-color="#2be6ff"/>
+<stop offset="1" stop-color="#8b5cf6"/>
+</linearGradient>
+</defs>
+<path d="M35 20h50c14 0 22 9 24 22 2 12-3 26-13 26-8 0-11-8-16-8H40c-5 0-8 8-16 8-10 0-15-14-13-26 2-13 10-22 24-22z" stroke="url(#padGrad)" stroke-width="3.5" stroke-linejoin="round"/>
+<path d="M30 40h14M37 33v14" stroke="url(#padGrad)" stroke-width="3.5" stroke-linecap="round"/>
+<circle cx="82" cy="33" r="3.5" stroke="url(#padGrad)" stroke-width="3"/>
+<circle cx="92" cy="43" r="3.5" stroke="url(#padGrad)" stroke-width="3"/>
+<circle cx="72" cy="43" r="3.5" stroke="url(#padGrad)" stroke-width="3"/>
+<circle cx="82" cy="53" r="3.5" stroke="url(#padGrad)" stroke-width="3"/>
+</svg>
+
+<h1 class="title"><span class="a">APEX</span><span class="g">GAMEZ</span></h1>
+
+<div class="tagline"><i></i><span>Ultimate Gaming Experience</span><i></i></div>
+
+<div class="ring-wrap">
+<div class="ring"></div>
+<div class="ring-orbit"><i></i></div>
+<div class="ring-glow"></div>
+<div style="position:relative;z-index:2;text-align:center;">
+<div class="ring-text">LOADING</div>
+<div class="dots"><span></span><span></span><span></span></div>
+</div>
+</div>
+
+<div class="progress-wrap">
+<div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+<div class="progress-pct" id="progressPct">0%</div>
+</div>
+</div>
+
+<script>
+/* scatter neon shards / streaks / dots to match the reference art */
+(function(){
+const wrap = document.getElementById('shards');
+const frag = document.createDocumentFragment();
+
+const streaks = [{t:'2%',l:'0%',w:'6px',h:'260px',r:'34deg'}];
+streaks.forEach(s=>{
+const el=document.createElement('div');
+el.className='streak';
+el.style.top=s.t;el.style.left=s.l;el.style.width=s.w;el.style.height=s.h;
+el.style.transform=`rotate(${s.r})`;
+frag.appendChild(el);
+});
+
+const shardPos=[
+{t:'6%',l:'82%',s:22,c:'violet',r:15},
+{t:'34%',l:'6%',s:26,c:'violet',r:-20},
+{t:'40%',l:'92%',s:18,c:'cyan',r:40},
+{t:'60%',l:'2%',s:20,c:'violet',r:10},
+{t:'88%',l:'88%',s:24,c:'cyan',r:-15},
+{t:'12%',l:'55%',s:12,c:'violet',r:60},
+{t:'70%',l:'70%',s:14,c:'cyan',r:-40}
+];
+shardPos.forEach(p=>{
+const el=document.createElement('div');
+el.className='shard';
+const color = p.c==='cyan' ? '#2be6ff' : '#8b5cf6';
+el.style.top=p.t;el.style.left=p.l;
+el.style.width=p.s+'px';el.style.height=p.s+'px';
+el.style.background=`linear-gradient(160deg, ${color}, transparent)`;
+el.style.opacity='.55';
+el.style.setProperty('--r', p.r+'deg');
+el.style.transform=`rotate(${p.r}deg)`;
+frag.appendChild(el);
+});
+
+const dotPos=['10% 18%','88% 10%','78% 30%','20% 55%','92% 62%','15% 80%','60% 8%'];
+dotPos.forEach((pos,i)=>{
+const [l,t]=pos.split(' ');
+const el=document.createElement('div');
+el.className='dot';
+el.style.left=l;el.style.top=t;
+el.style.width='3px';el.style.height='3px';
+el.style.background= i%2===0 ? '#2be6ff' : '#c026d3';
+el.style.animationDelay=(i*0.4)+'s';
+frag.appendChild(el);
+});
+
+wrap.appendChild(frag);
+})();
+
+/* keep the % label in sync with the 4s CSS fill animation */
+(function(){
+const pct = document.getElementById('progressPct');
+const start = performance.now();
+const duration = 4000;
+function tick(now){
+const p = Math.min(100, Math.round(((now - start) / duration) * 100));
+pct.textContent = p + '%';
+if(p < 100) requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+})();
+
 setTimeout(() => {
-
-    let username = localStorage.getItem("username");
-
-    if(username){
-        window.location.href = "main.html";
-    }
-    else{
-        window.location.href = "username.html";
-    }
-
-}, 3000); // 5000ms = 5 seconds
-
+let username = localStorage.getItem("username");
+if(username){
+window.location.href = "main.html";
+}
+else{
+window.location.href = "username.html";
+}
+}, 3000);
 </script>
-    </body>
+
+</body>
 </html>
